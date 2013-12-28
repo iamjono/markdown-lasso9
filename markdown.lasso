@@ -34,6 +34,7 @@ define markdown => type {
 	private decode() => {
 		.source->replace('\r\n','\|\\')
 		.source->replace('\n','\|\\')
+		.source->replace('\r','\|\\')
 	
 		.lines = .source->split('\|\\')
 		.stdheaders
