@@ -6,7 +6,7 @@ if a mistake is made in the source syntax.
 
 Processes Markdown Syntax as per [John Gruber's spec](http://daringfireball.net/projects/markdown/syntax)
 
-The project is a work in progress - please see the below.
+The project is a work in progress - please see below.
 
 Supports
 --------
