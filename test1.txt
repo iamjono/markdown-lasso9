@@ -1,0 +1,29 @@
+First-level Setex heading
+=========================
+
+A normal paragraph.
+
+Second-level Setex heading
+--------------------------
+
+Another paragraph
+
+...
+
+# First-level atx heading #
+
+A normal paragraph with `[some_code]`.
+
+#### Fourth-level atx heading ####
+
+Another paragraph, this time with some emphasis added - em: *single asterisks*, 
+strong: **double asterisks**, strong: __double underscores__. And then finished.
+
+This should be a protected asterisk * and a protected underscore _ ...
+This should be a protected backtick \` and a protected asterisk \*...
+
+    local(x = 1)
+    #x * 2
+    "<span>One & Two</span>"
+
+....
