@@ -17,9 +17,10 @@ Supports
 - * demark em
 - * & _ surrounded by spaces are protected.
 - escaped backticks are protected
-- text inline and surrounded by backticks is wrapped in <code>...</code>
+- text inline and surrounded by backticks is wrapped in `<code>...</code>`
 	
 TODO
+----
 - Links
 - Images
 - Lists
