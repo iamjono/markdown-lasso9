@@ -9,6 +9,7 @@ Supports
 	* & _ surrounded by spaces are protected.
 	escaped backticks are protected
 	text inline and surrounded by backticks is wrapped in <code>...</code>
+	unordered lists (lines starting with -)
 	
 TODO
 	Links
@@ -35,11 +36,12 @@ define markdown => type {
 		.source->replace('\r\n','\|\\')
 		.source->replace('\n','\|\\')
 		.source->replace('\r','\|\\')
-	
+		
 		.lines = .source->split('\|\\')
 		.stdheaders
 		.atxheaders
 		.codeblock
+		.ulists
 		.out = .lines->join('\r\n')
 		.protectSpecial
 		.emphasis('**','<strong>','</strong>')
@@ -144,6 +146,34 @@ define markdown => type {
 		}
 		.lines = #newlines
 	}
+	private ulists() => {
+		local(counter = 1, newlines = array, ulstate = false)
+		with line in .lines do => {
+			if(#counter <= .lines->size) => {
+				if(#line->beginswith('-') ) => {
+					#line = #line->sub(2)
+					#ulstate == false ? 
+						#newlines->insert('<ul><li>'+#line+'</li>') |
+						#newlines->insert('<li>'+#line+'</li>')
+					#ulstate = true
+					protect => {
+						handle_error => {
+							#newlines->last->append('</ul>')
+							#ulstate = false
+						}
+						// if not end of doc check for open ul
+						if(not .lines->get(#counter + 1)->beginswith('-')) => {
+							#newlines->last->append('</ul>')
+							#ulstate = false
+						}
+					}
+				else
+					#newlines->insert(#line)
+				}
+				#counter++
+			}
+		}
+		.lines = #newlines	}
 	private deProtectSpecial() => {
 		.out->replace('|||||DASTERISK|||||','**')
 		.out->replace('|||||ASTERISK|||||','*')
