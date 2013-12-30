@@ -18,9 +18,9 @@ Supports
 - * & _ surrounded by spaces are protected.
 - escaped backticks are protected
 - text inline and surrounded by backticks is wrapped in `<code>...</code>`
+- unordered lists (lines starting with -)
 	
 TODO
 ----
 - Links
 - Images
-- Lists
