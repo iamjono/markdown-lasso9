@@ -10,6 +10,7 @@ Supports
 	escaped backticks are protected
 	text inline and surrounded by backticks is wrapped in <code>...</code>
 	unordered lists (lines starting with -)
+	hr
 	
 TODO
 	Links
@@ -22,10 +23,14 @@ define markdown => type {
 		private lines::array,
 		private out::string
 	public onCreate(src::string) => {
-		#src->trim
+		//#src->trim
+		while(#src->beginswith('\r\n')) => {
+			#src->removeLeading('\r\n')
+			//#src->trim
+		}
 		while(#src->endswith('\r\n')) => {
 			#src->removeTrailing('\r\n')
-			#src->trim
+			//#src->trim
 		}
 		not #src->size ? return string
 		.source = #src
@@ -36,11 +41,12 @@ define markdown => type {
 		.source->replace('\r\n','\|\\')
 		.source->replace('\n','\|\\')
 		.source->replace('\r','\|\\')
-		
+	
 		.lines = .source->split('\|\\')
 		.stdheaders
 		.atxheaders
 		.codeblock
+		.doHr
 		.ulists
 		.out = .lines->join('\r\n')
 		.protectSpecial
@@ -122,6 +128,12 @@ define markdown => type {
 					#line->replace('__','|||||DUNDERSCORE|||||')
 					#line->replace('_','|||||UNDERSCORE|||||')
 					
+					// replace tabs with 4 spaces
+					#line->replace('\t','    ')
+					
+					// remove first 4 spaces to remove first "indent"
+					#line->remove(1,4)
+					
 					// convert ampersands and angle brackets into html entities
 					#line->replace('&','&amp;')
 					#line->replace('<','&lt;')
@@ -130,13 +142,18 @@ define markdown => type {
 						#newlines->insert('<pre><code>'+#line) |
 						#newlines->insert(#line)
 					#tabstate = true
-					
-					if(
-						not .lines->get(#counter + 1)->beginswith('    ') && 
-						not .lines->get(#counter + 1)->beginswith('\t')
-					) => {
-						#newlines->last->append('</code></pre>')
-						#tabstate = false
+					protect => {
+						handle_error => {
+							#newlines->last->append('</code></pre>')
+							#tabstate = false
+						}
+						if(
+							not .lines->get(#counter + 1)->beginswith('    ') && 
+							not .lines->get(#counter + 1)->beginswith('\t')
+						) => {
+							#newlines->last->append('</code></pre>')
+							#tabstate = false
+						}
 					}
 				else
 					#newlines->insert(#line)
@@ -213,6 +230,23 @@ define markdown => type {
 				#newlines->append(#line)
 		}
 		.out = #newlines
+	}
+	private doHr() => {
+		local(newlines = array)
+		with line in .lines do => {
+			if(
+				#line->beginswith('* * *') || 
+				#line->beginswith('***') || 
+				#line->beginswith('- - -') || 
+				#line->beginswith('---') || 
+				#line->beginswith('_ _ _') || 
+				#line->beginswith('___')
+			) => {
+				#line = '<hr />'
+			}
+			#newlines->insert(#line)
+		}
+		.lines = #newlines
 	}
 }
 
