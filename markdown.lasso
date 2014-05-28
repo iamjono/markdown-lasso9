@@ -23,17 +23,19 @@ define markdown => type {
 		private lines::array,
 		private out::string
 	public onCreate(src::string) => {
+		local(newsrc = #src->asCopy) // force it to NOT be modified even in the original parent
+	
 		//#src->trim
-		while(#src->beginswith('\r\n')) => {
-			#src->removeLeading('\r\n')
+		while(#newsrc->beginswith('\r\n')) => {
+			#newsrc->removeLeading('\r\n')
 			//#src->trim
 		}
-		while(#src->endswith('\r\n')) => {
-			#src->removeTrailing('\r\n')
+		while(#newsrc->endswith('\r\n')) => {
+			#newsrc->removeTrailing('\r\n')
 			//#src->trim
 		}
-		not #src->size ? return string
-		.source = #src
+		not #newsrc->size ? return string
+		.source = #newsrc
 		.decode
 		return .out
 	}
