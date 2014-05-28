@@ -11,10 +11,12 @@ Supports
 	text inline and surrounded by backticks is wrapped in <code>...</code>
 	unordered lists (lines starting with -)
 	hr
-	
-TODO
 	Links
 	Images
+	
+TODO
+	References for Links and Images
+
 ============================================================= */
 
 define markdown => type {
@@ -45,6 +47,8 @@ define markdown => type {
 		.source->replace('\r','\|\\')
 	
 		.lines = .source->split('\|\\')
+		.doImages
+		.doLinks
 		.stdheaders
 		.atxheaders
 		.codeblock
@@ -192,7 +196,8 @@ define markdown => type {
 				#counter++
 			}
 		}
-		.lines = #newlines	}
+		.lines = #newlines
+	}
 	private deProtectSpecial() => {
 		.out->replace('|||||DASTERISK|||||','**')
 		.out->replace('|||||ASTERISK|||||','*')
@@ -246,6 +251,30 @@ define markdown => type {
 			) => {
 				#line = '<hr />'
 			}
+			#newlines->insert(#line)
+		}
+		.lines = #newlines
+	}
+	private doImages() => {
+		local(newlines = array)
+		with line in .lines do => {
+			#line = string_replaceregexp(
+				#line,
+				-find='(!\\[)([^\\]]+)(\\])(\\()([^\\)\\s]+)(?:\\s+"(.*)")?(\\))',
+				-replace='<img src=\"\\5\" alt=\"\\2\" title=\"\\6\">'
+			)
+			#newlines->insert(#line)
+		}
+		.lines = #newlines
+	}
+	private doLinks() => {
+		local(newlines = array)
+		with line in .lines do => {
+			#line = string_replaceregexp(
+				#line,
+				-find='(\\[)([^\\]]+)(\\])(\\()([^\\)\\s]+)(?:\\s+"(.*)")?(\\))',
+				-replace='<a href=\"\\5\" title=\"\\6\">\\2</a>'
+			)
 			#newlines->insert(#line)
 		}
 		.lines = #newlines
