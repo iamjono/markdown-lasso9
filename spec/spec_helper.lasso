@@ -2,20 +2,25 @@ local(path_here) = currentCapture->callsite_file->stripLastComponent
 not #path_here->beginsWith('/')? #path_here = io_file_getcwd + '/' + #path_here
 not #path_here->endsWith('/')  ? #path_here->append('/')
 
-with file in (:
+define dir_import(d::dir, ext::staticarray=(:'lasso', 'inc')) => {
+    with f in #d->eachFile
+    where #ext->contains(#f->path->split('.')->last) 
+    do file_import(#f)
+
+    with f in #d->eachDir do dir_import(#f)
+}
+define file_import(f::file) => {
+    sourcefile(#f, -autoCollect=false)->invoke
+}
+
+with path in (:
     'markdown.lasso',
-    'markdown_document.lasso',
-    'markdown_hr.lasso',
-    'markdown_codeblock.lasso',
-    'markdown_html.lasso',
-    'markdown_headerAtx.lasso',
-    'markdown_headerSetext.lasso',
-    'markdown_paragraph.lasso',
-    'markdown_blockquote.lasso',
-    'markdown_listOrdered.lasso',
-    'markdown_listUnordered.lasso',
-    'markdown_listItem.lasso'
+    'parsers/'
 )
-do sourcefile(file(#path_here + '../' #file), -autoCollect=false)->invoke
+do {
+    #path->endsWith('/')
+        ? dir_import(dir(#path_here + '../' #path))
+        | file_import(file(#path_here + '../' #path))
+}
 
 var(_markdown_loaded) = true
