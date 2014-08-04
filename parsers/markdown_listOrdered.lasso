@@ -1,7 +1,4 @@
-define markdown_listOrdered => type {
-    data
-        private render,
-        private leftover
+define markdown_listOrdered => type { parent markdown_parser
 
     public onCreate(lines::staticarray) => {
         .render   = '<ul>\n'
@@ -23,19 +20,5 @@ define markdown_listOrdered => type {
         .render == '<ul>\n'
             ? .render = ''
             | .render->append('</ul>\n')
-    }
-
-    public
-        render   => .`render`,
-        leftover => .`leftover`
-
-    private removeLeadingEmptyLines(lines::staticarray) => {
-        local(i)    = 1
-        local(size) = #lines->size 
-        while(#i <= #size and #lines->get(#i)->asCopy->trim& == '') => {
-            #i++
-        }
-
-        return #lines->sub(#i)
     }
 }

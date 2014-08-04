@@ -1,4 +1,4 @@
-define markdown_document => type {
+define markdown_document => type { parent markdown_parser
     data
         public lines::staticarray,
 
@@ -15,43 +15,37 @@ define markdown_document => type {
         )
 
     public onCreate(lines::staticarray) => {
-        .lines = #lines
+        .lines    = #lines
+        .leftover = (:)
     }
 
 
     public render => {
-        local(result)   = ``
-        local(unparsed) = .removeLeadingEmptyLines(.lines)
-        local(size)     = #unparsed->size
-        while(#size) => {
+        if(.`render`->isNotA(::string)) => {
+            local(result)   = ``
+            local(unparsed) = .removeLeadingEmptyLines(.lines)
+            local(size)     = #unparsed->size
+            while(#size) => {
 
-            loop(.parsers->size) => {
-                local(parser)  = .parsers->get(loop_count)
-                local(partial) = \(#parser)(#unparsed)
+                loop(.parsers->size) => {
+                    local(parser)  = .parsers->get(loop_count)
+                    local(partial) = \(#parser)(#unparsed)
 
-                #partial->render == ''
-                    ? loop_continue
+                    #partial->render == ''
+                        ? loop_continue
 
-                #result->append(#partial->render)
-                #unparsed = .removeLeadingEmptyLines(#partial->leftover)
-                loop_abort
+                    #result->append(#partial->render)
+                    #unparsed = .removeLeadingEmptyLines(#partial->leftover)
+                    loop_abort
+                }
+
+                #size == #unparsed->size
+                    ? fail("Could not parse the document")
+
+                #size = #unparsed->size
             }
-
-            #size == #unparsed->size
-                ? fail("Could not parse the document")
-
-            #size = #unparsed->size
+            .`render` = #result
         }
-        return #result
-    }
-
-    private removeLeadingEmptyLines(lines::staticarray) => {
-        local(i)    = 1
-        local(size) = #lines->size 
-        while(#i <= #size and #lines->get(#i)->asCopy->trim& == '') => {
-            #i++
-        }
-
-        return #lines->sub(#i)
+        return .`render`
     }
 }

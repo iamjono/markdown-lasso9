@@ -1,7 +1,4 @@
-define markdown_html => type {
-    data
-        private render,
-        private leftover
+define markdown_html => type { parent markdown_parser
 
     public onCreate(lines::staticarray) => {
         .render = ''
@@ -32,9 +29,4 @@ define markdown_html => type {
 
         .leftover = #lines->sub(#end+1)
     }
-
-
-    public
-        render   => .`render`,
-        leftover => .`leftover`
 }

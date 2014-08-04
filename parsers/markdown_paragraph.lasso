@@ -1,7 +1,4 @@
-define markdown_paragraph => type {
-    data
-        private render,
-        private leftover
+define markdown_paragraph => type { parent markdown_parser
 
     public onCreate(lines::staticarray) => {
         local(line1) = #lines->first->asCopy
@@ -29,9 +26,4 @@ define markdown_paragraph => type {
         .render->removeTrailing("\n")&append("</p>\n")
         .leftover = #lines->sub(#end)
     }
-
-
-    public
-        render   => .`render`,
-        leftover => .`leftover`
 }

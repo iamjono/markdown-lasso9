@@ -1,7 +1,4 @@
-define markdown_codeblock => type {
-    data
-        private render,
-        private leftover
+define markdown_codeblock => type { parent markdown_parser
 
     public onCreate(lines::staticarray) => {
         .render = ''
@@ -33,9 +30,4 @@ define markdown_codeblock => type {
         .render->append(`</code></pre>`)
         .leftover = #lines->sub(#end)
     }
-
-
-    public
-        render   => .`render`,
-        leftover => .`leftover`
 }

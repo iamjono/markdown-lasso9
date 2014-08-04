@@ -1,7 +1,4 @@
-define markdown_headerSetext => type {
-    data
-        private render,
-        private leftover
+define markdown_headerSetext => type { parent markdown_parser
 
     public onCreate(lines::staticarray) => {
         local(line1) = #lines->first->asCopy
@@ -18,9 +15,4 @@ define markdown_headerSetext => type {
         .render   = '<h' + #level + '>' + #line1->trim& + '</h' + #level + '>\n'
         .leftover = #lines->sub(3)
     }
-
-
-    public
-        render   => .`render`,
-        leftover => .`leftover`
 }

@@ -1,7 +1,4 @@
-define markdown_hr => type {
-    data
-        private render,
-        private leftover
+define markdown_hr => type { parent markdown_parser
 
     public onCreate(lines::staticarray) => {
         local(line1) = #lines->first
@@ -18,9 +15,4 @@ define markdown_hr => type {
             .leftover = #lines
         }
     }
-
-
-    public
-        render   => .`render`,
-        leftover => .`leftover`
 }

@@ -1,7 +1,4 @@
-define markdown_blockquote => type {
-    data
-        private render,
-        private leftover
+define markdown_blockquote => type { parent markdown_parser
 
     public onCreate(lines::staticarray) => {
         local(line1) = #lines->first
@@ -35,9 +32,4 @@ define markdown_blockquote => type {
         .render->append('</blockquote>\n')
         .leftover = #lines->sub(#end)
     }
-
-
-    public
-        render   => .`render`,
-        leftover => .`leftover`
 }

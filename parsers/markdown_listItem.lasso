@@ -1,8 +1,5 @@
-define markdown_listItem => type {
+define markdown_listItem => type { parent markdown_parser
     data
-        private render,
-        private leftover,
-
         public isOrdered::boolean
 
     public onCreate(lines::staticarray, -ordered::boolean=false, -unordered::boolean=false) => {
@@ -70,13 +67,9 @@ define markdown_listItem => type {
         .leftover = #lines->sub(#end)
     }
 
-    public
-        render      => .`render`,
-        leftover    => .`leftover`,
-        isUnordered => not .isOrdered
-
+    public isUnordered => not .isOrdered
     public isUnordered=(rhs::boolean) => {
-            .isOrdered = not #rhs
-            return #rhs
-        }
+        .isOrdered = not #rhs
+        return #rhs
+    }
 }
