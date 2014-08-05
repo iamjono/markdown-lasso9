@@ -29,6 +29,11 @@ describe(::markdown_headerAtx) => {
             local(header) = markdown_headerAtx((:"###### Sixth"))
             expect('<h6>Sixth</h6>\n', #header->render)
         }
+
+        it(`strips off trailing "closing" hashes and whitespace`) => {
+            local(header) = markdown_headerAtx((:"### Siren's Song #####"))
+            expect(`<h3>Siren's Song</h3>` + "\n", #header->render)
+        }
     }
 
     describe(`-> leftover`) => {
