@@ -2,7 +2,7 @@ local(path_here) = currentCapture->callsite_file->stripLastComponent
 not #path_here->beginsWith('/')? #path_here = io_file_getcwd + '/' + #path_here
 not #path_here->endsWith('/')  ? #path_here->append('/')
 not var_defined('_markdown_loaded')
-    ? sourcefile(file(#path_here + 'spec_helper.lasso'), -autoCollect=false)->invoke
+    ? sourcefile(file(#path_here + '../spec_helper.lasso'), -autoCollect=false)->invoke
 
 describe(::markdown_listItem) => {
     describe(`creator method`) => {
