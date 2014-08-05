@@ -1,12 +1,13 @@
 define markdown_listOrdered => type { parent markdown_parser
 
-    public onCreate(lines::staticarray) => {
+    public onCreate(document::markdown_document, lines::staticarray) => {
+        .document = #document
         .render   = '<ul>\n'
         
         //keep rendering list item
         local(line)
         while(#lines->size) => {
-            #line = markdown_listItem(#lines, -ordered)
+            #line = markdown_listItem(.document, #lines, -ordered)
 
             #line->render == ''
                 ? loop_abort

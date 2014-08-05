@@ -15,6 +15,7 @@ define file_import(f::file) => {
 
 with path in (:
     'markdown.lasso',
+    'markdown_reference.lasso',
     'parsers/'
 )
 do {

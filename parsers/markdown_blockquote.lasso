@@ -1,6 +1,8 @@
 define markdown_blockquote => type { parent markdown_parser
 
-    public onCreate(lines::staticarray) => {
+    public onCreate(document::markdown_document, lines::staticarray) => {
+        .document = #document
+        
         local(line1) = #lines->first
         if(not #line1->beginsWith('> ')) => {
             .render   = ''
@@ -28,7 +30,7 @@ define markdown_blockquote => type { parent markdown_parser
 
             #previous_line_empty = #cur_lineEmpty
         }
-        .render->append(markdown_document(#block->asStaticarray)->render)
+        .render->append(markdown_document(.document, #block->asStaticarray)->render)
         .render->append('</blockquote>\n')
         .leftover = #lines->sub(#end)
     }

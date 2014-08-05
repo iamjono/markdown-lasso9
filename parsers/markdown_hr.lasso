@@ -1,6 +1,8 @@
 define markdown_hr => type { parent markdown_parser
 
-    public onCreate(lines::staticarray) => {
+    public onCreate(document::markdown_document, lines::staticarray) => {
+        .document = #document
+        
         local(line1) = #lines->first
 
         if(

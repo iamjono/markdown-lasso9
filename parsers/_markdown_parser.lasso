@@ -1,17 +1,20 @@
 define markdown_parser => type {
     data
         protected render,
-        protected leftover
+        protected leftover,
+        protected document
 
     public
         render   => .`render`,
-        leftover => .`leftover`
+        leftover => .`leftover`,
+        document => .`document`
 
-    public onCreate(lines::staticarray) => {
+    public onCreate(document::markdown_document, lines::staticarray) => {
         .render   = ''
         .leftover = #lines
+        .document = #document
+        .onCreate(#lines)
     }
-
 
     protected removeLeadingEmptyLines(lines::staticarray) => {
         local(i)    = 1

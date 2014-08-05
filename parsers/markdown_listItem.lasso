@@ -2,10 +2,11 @@ define markdown_listItem => type { parent markdown_parser
     data
         public isOrdered::boolean
 
-    public onCreate(lines::staticarray, -ordered::boolean=false, -unordered::boolean=false) => {
+    public onCreate(document::markdown_document, lines::staticarray, -ordered::boolean=false, -unordered::boolean=false) => {
         (not #ordered and not #unordered) or (#ordered and #unordered)
             ? fail(error_code_invalidParameter, "Must pass either -ordered or -unordered (and not both)")
 
+        .document  = #document
         .isOrdered = #ordered
 
         .isOrdered
@@ -41,7 +42,7 @@ define markdown_listItem => type { parent markdown_parser
 
             #block->insert(#line)
         }
-        .render->append(markdown_inlineText(#block->asStaticarray)->render + "\n")
+        .render->append(markdown_inlineText(.document, #block->asStaticarray)->render + "\n")
 
 
         local(previous_line_empty) = true
@@ -65,7 +66,7 @@ define markdown_listItem => type { parent markdown_parser
             #previous_line_empty = #cur_lineEmpty
         }
 
-        .render->append(markdown_document(#block->asStaticarray)->render)
+        .render->append(markdown_document(.document, #block->asStaticarray)->render)
         .render->append('</li>\n')
         .leftover = #lines->sub(#end)
     }

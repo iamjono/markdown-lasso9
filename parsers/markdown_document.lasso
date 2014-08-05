@@ -1,6 +1,7 @@
 define markdown_document => type { parent markdown_parser
     data
         public lines::staticarray,
+        public references,
 
         private parsers = (:
             ::markdown_hr,
@@ -14,12 +15,34 @@ define markdown_document => type { parent markdown_parser
             ::markdown_paragraph
         )
 
-    public onCreate(lines::staticarray) => {
-        .lines    = #lines
-        .leftover = (:)
+    // Really should only be used for sub-parts of the document
+    // Like for blockquotes or lists
+    public onCreate(document::markdown_document, lines::staticarray) => {
+        .lines      = #lines
+        .leftover   = (:)
+        .references = #document->references
     }
     public onCreate(source::string) => {
-        .onCreate(regExp(-input=#source, -find=`\r\n|\r|\n`)->split)
+        local(regex) = regExp(
+            -find  = `(?m)^[ ]{0,3}\[(.+)\]:[ \t]+<?(\S+?)>?(?:\s+[ \t]*["'(](.+?)["')])?[ \t]*$`,
+            -input = #source
+        )
+        local(refs) = map
+
+        while(#regex->find) => {
+            local(id)    = #regex->matchString(1)
+            local(url)   = #regex->matchString(2)
+            local(title) = #regex->matchString(3)
+
+            #refs->insert(#id = markdown_reference(#id, #url, #title))
+            #regex->appendReplacement(``)
+        }
+        #regex->appendTail
+
+        #source     = #regex->output
+        .references = #refs
+
+        .onCreate(self, regExp(-input=#source, -find=`\r\n|\r|\n`)->split)
     }
 
 
@@ -32,7 +55,7 @@ define markdown_document => type { parent markdown_parser
 
                 loop(.parsers->size) => {
                     local(parser)  = .parsers->get(loop_count)
-                    local(partial) = \(#parser)(#unparsed)
+                    local(partial) = \(#parser)(self, #unparsed)
 
                     #partial->render == ''
                         ? loop_continue

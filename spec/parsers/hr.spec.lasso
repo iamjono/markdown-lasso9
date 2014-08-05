@@ -4,37 +4,39 @@ not #path_here->endsWith('/')  ? #path_here->append('/')
 not var_defined('_markdown_loaded')
     ? sourcefile(file(#path_here + '../spec_helper.lasso'), -autoCollect=false)->invoke
 
+local(document) = markdown_document(``)
+
 describe(::markdown_hr) => {
     describe(`-> render`) => {
         it(`returns an empty string if the first line doesn't match a markdown HR`) => {
-            local(hr) = markdown_hr((:"not correct"))
+            local(hr) = markdown_hr(#document, (:"not correct"))
             expect('', #hr->render)
         }
         it(`returns an hr tag if passed lines match markdown HR`) => {
-            local(hr) = markdown_hr((:"- - -"))
+            local(hr) = markdown_hr(#document, (:"- - -"))
             expect('<hr />', #hr->render)
 
-            local(hr) = markdown_hr((:"***"))
+            local(hr) = markdown_hr(#document, (:"***"))
             expect('<hr />', #hr->render)
 
-            local(hr) = markdown_hr((:"_ _    _"))
+            local(hr) = markdown_hr(#document, (:"_ _    _"))
             expect('<hr />', #hr->render)
         }
     }
 
     describe(`-> leftover`) => {
         it(`returns the original array if not a markdown hr`) => {
-            local(hr) = markdown_hr((:"not correct"))
+            local(hr) = markdown_hr(#document, (:"not correct"))
             expect((:"not correct"), #hr->leftover)
         }
 
         it(`returns an empty staticarray if only one line and a markdown hr`) => {
-            local(hr) = markdown_hr((:"* * *"))
+            local(hr) = markdown_hr(#document, (:"* * *"))
             expect((:), #hr->leftover)
         }
 
         it(`returns a staticarray that has the first element removed`) => {
-            local(hr) = markdown_hr((:"---------", "", "Next"))
+            local(hr) = markdown_hr(#document, (:"---------", "", "Next"))
             expect((:"", "Next"), #hr->leftover)
         }
     }

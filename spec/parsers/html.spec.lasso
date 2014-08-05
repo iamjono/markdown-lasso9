@@ -4,14 +4,16 @@ not #path_here->endsWith('/')  ? #path_here->append('/')
 not var_defined('_markdown_loaded')
     ? sourcefile(file(#path_here + '../spec_helper.lasso'), -autoCollect=false)->invoke
 
+local(document) = markdown_document(``)
+
 describe(::markdown_html) => {
     describe(`-> render`) => {
         it(`returns an empty string if the first line doesn't match an html block`) => {
-            local(html) = markdown_html((:"< nope"))
+            local(html) = markdown_html(#document, (:"< nope"))
             expect("", #html->render)
         }
         it(`returns an html block if passed lines matching markdown codeblock`) => {
-            local(html) = markdown_html((:
+            local(html) = markdown_html(#document, (:
                 `<div class="foo">`,
                 `<div id="bar"></div>`,
                 `</div>`
@@ -25,7 +27,7 @@ describe(::markdown_html) => {
         }
         
         it(`correctly parses html block with blank lines`) => {
-            local(html) = markdown_html((:
+            local(html) = markdown_html(#document, (:
                 `<div class="foo">`,
                 '',
                 ``,
@@ -42,7 +44,7 @@ describe(::markdown_html) => {
         }
 
         it(`correctly parses html block with indented lines`) => {
-            local(html) = markdown_html((:
+            local(html) = markdown_html(#document, (:
                 `<div class="foo">`,
                 `    <div id="bar"></div>`,
                 '\t<p></p>',
@@ -60,12 +62,12 @@ describe(::markdown_html) => {
 
     describe(`-> leftover`) => {
         it(`returns the original array if not an html block`) => {
-            local(html) = markdown_html((:"< nope"))
+            local(html) = markdown_html(#document, (:"< nope"))
             expect((:"< nope"), #html->leftover)
         }
 
         it(`returns an empty staticarray if all lines are an html block`) => {
-            local(html) = markdown_html((:
+            local(html) = markdown_html(#document, (:
                 `<div class="foo">`,
                 '\t ',
                 `    <div id="bar"></div>`,
@@ -77,7 +79,7 @@ describe(::markdown_html) => {
         }
 
         it(`returns a staticarray without the html block lines`) => {
-            local(html) = markdown_html((:
+            local(html) = markdown_html(#document, (:
                 `<div class="foo">`,
                 `</div>`,
                 'here'
@@ -85,7 +87,7 @@ describe(::markdown_html) => {
             expect((:'here'), #html->leftover)
         }
         it(`returns a staticarray without the html block lines even when opening block is two tags`) => {
-            local(html) = markdown_html((:
+            local(html) = markdown_html(#document, (:
                 `<div><p>`,
                 `</p>`,
                 `</div>`,

@@ -1,6 +1,8 @@
 define markdown_paragraph => type { parent markdown_parser
 
-    public onCreate(lines::staticarray) => {
+    public onCreate(document::markdown_document, lines::staticarray) => {
+        .document = #document
+        
         local(line1) = #lines->first->asCopy
 
         if(#line1->asCopy->trim& == '') => {
@@ -24,7 +26,7 @@ define markdown_paragraph => type { parent markdown_parser
             #block->insert(#line)
         }
 
-        .render->append(markdown_inlineText(#block->asStaticArray)->render + "</p>\n")
+        .render->append(markdown_inlineText(.document, #block->asStaticArray)->render + "</p>\n")
         .leftover = #lines->sub(#end)
     }
 }

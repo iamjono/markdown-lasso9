@@ -1,7 +1,8 @@
 define markdown_html => type { parent markdown_parser
 
-    public onCreate(lines::staticarray) => {
-        .render = ''
+    public onCreate(document::markdown_document, lines::staticarray) => {
+        .document = #document
+        .render   = ''
 
         local(line1)   = #lines->first
         local(reStart) = regExp(-input=#line1, -find=`^<([^\s>]+).*?>.*$`)

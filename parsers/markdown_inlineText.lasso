@@ -2,50 +2,85 @@ define markdown_inlineText => type { parent markdown_parser
     data
         protected escapeCharacters = (:`\`, '`', `*`, `_`, `{`, `}`, `[`, `]`, `(`, `)`, `#`, `+`, `-`, `.`, `!`)
     
-    public onCreate(lines::staticarray) => {
+    public onCreate(document::markdown_document, lines::staticarray) => {
+        .document = #document
         .leftover = (:)
 
         local(result) = #lines->join('\n')
 
         // Find inline code spans (``)
-        local(my_regexp) = regExp(-find='(?s)(`+)(.+?)(?<!`)\\1(?!`)', -input=#result)
-        while(#my_regexp->find) => {
-            #my_regexp->appendReplacement(
-                '<code>' + .encodeCode(#my_regexp->matchString(2))->trim& + '</code>'
+        local(regex) = regExp(-find='(?s)(`+)(.+?)(?<!`)\\1(?!`)', -input=#result)
+        while(#regex->find) => {
+            #regex->appendReplacement(
+                '<code>' + .encodeCode(#regex->matchString(2))->trim& + '</code>'
             )
         }
-        #my_regexp->appendTail
-        #result = #my_regexp->output
+        #regex->appendTail
+        #result = #regex->output
 
 
         // Find inline images
-        local(my_regexp) = regExp(-find=`(?s)!\[(.*?)\]\([ \t]*<?(\S+?)>?([ \t]+(['"])(.*?)\4[ \t]*)?\)`, -input=#result)
-        while(#my_regexp->find) => {
-            local(m1) = .escapeSpecialChars(#my_regexp->matchString(1) || '')
-            local(m2) = .escapeSpecialChars(#my_regexp->matchString(2) || '')
-            local(m5) = .escapeSpecialChars(#my_regexp->matchString(5) || '')
+        local(regex) = regExp(-find=`(?s)!\[(.*?)\]\([ \t]*<?(\S+?)>?([ \t]+(['"])(.*?)\4[ \t]*)?\)`, -input=#result)
+        while(#regex->find) => {
+            local(m1) = #regex->matchString(1)
+            local(m2) = #regex->matchString(2)
+            local(m5) = #regex->matchString(5)
 
-            #my_regexp->appendReplacement(
-                `<img src="` + #m2 + `" alt="` + #m1 + `"` + (#my_regexp->matchString(5)? ` title="` + #m5 + `"` | '') +` />`
+            #regex->appendReplacement(
+                `<img src="` + .escapeSpecialChars(#m2) + `" alt="` + .escapeSpecialChars(#m1) + `"` + 
+                    (#m5? ` title="` + .escapeSpecialChars(#m5) + `"` | '') +` />`
             )
         }
-        #my_regexp->appendTail
-        #result = #my_regexp->output
+        #regex->appendTail
+        #result = #regex->output
+
+        // Find referenced images
+        local(regex) = regExp(-find=`(?s)!\[(.*?)\](?: |\n *)?\[(.*?)\]`, -input=#result)
+        while(#regex->find) => {
+            local(alt) = #regex->matchString(1)
+            local(id)  = #regex->matchString(2)
+            local(ref) = .document->references->find(#id)
+
+            #ref
+                ? #regex->appendReplacement(
+                    `<img src="` + .escapeSpecialChars(#ref->url) + `" alt="` + .escapeSpecialChars(#alt) + `"` + 
+                        (#ref->title? ` title="` + .escapeSpecialChars(#ref->title) | '') + `"` + " />"
+                )
+                | #regex->appendReplacement('$0')
+        }
+        #regex->appendTail
+        #result = #regex->output
 
 
         // Find inline links
-        local(my_regexp) = regExp(-find=`(?s)\[(.*?)\]\([ \t]*<?(.*?)>?([ \t]+(['"])(.*?)\4)?\)`, -input=#result)
-        while(#my_regexp->find) => {
-            local(m1) = .escapeSpecialChars(#my_regexp->matchString(1) || '')
-            local(m2) = .escapeSpecialChars(#my_regexp->matchString(2) || '')
-            local(m5) = .escapeSpecialChars(#my_regexp->matchString(5) || '')
+        local(regex) = regExp(-find=`(?s)\[(.*?)\]\([ \t]*<?(.*?)>?([ \t]+(['"])(.*?)\4)?\)`, -input=#result)
+        while(#regex->find) => {
+            local(m1) = #regex->matchString(1)
+            local(m2) = #regex->matchString(2)
+            local(m5) = #regex->matchString(5)
 
-            #my_regexp->appendReplacement(
-                `<a href="` + #m2 + `"` + (#my_regexp->matchString(5)? ` title="` + #m5 + `"` | '') + `>` + #m1 + `</a>`
+            #regex->appendReplacement(
+                `<a href="` + .escapeSpecialChars(#m2) + `"` + (#m5? ` title="` + .escapeSpecialChars(#m5) + `"` | '') + `>` + .escapeSpecialChars(#m1) + `</a>`
             )
         }
-        #my_regexp->appendTail
-        #result = #my_regexp->output
+        #regex->appendTail
+        #result = #regex->output
+
+        // Find referenced links
+        local(regex) = regExp(-find=`(?s)\[(.*?)\](?: |\n *)?\[(.*?)\]`, -input=#result)
+        while(#regex->find) => {
+            local(txt) = #regex->matchString(1)
+            local(id)  = #regex->matchString(2) || #txt
+            local(ref) = .document->references->find(#id)
+
+            #ref
+                ? #regex->appendReplacement(
+                    `<a href="` + .escapeSpecialChars(#ref->url) + `"` + (#ref->title? ` title="` + .escapeSpecialChars(#ref->title) + `"` | '') + `>` + .escapeSpecialChars(#txt) + `</a>`
+                )
+                | #regex->appendReplacement('$0')
+        }
+        #regex->appendTail
+        #result = #regex->output
 
 
         #result->replace(' - ', ` \- `)
