@@ -12,22 +12,24 @@ define markdown_codeblock => type { parent markdown_parser
             return
         }
 
-        local(end) = 0
+        local(end)  = 0
+        local(text) = ``
         .render->append(`<pre><code>`)
 
         while(++#end <= #lines->size) => {
             local(line) = #lines->get(#end)->asCopy
 
             #line->asCopy->trim& == ''
-                ? .render->append("\n")
+                ? #text->append("\n")
             |#line->beginsWith("    ")
-                ? .render->append(#line->sub(5) + "\n")
+                ? #text->append(#line->sub(5) + "\n")
             | #line->beginsWith("\t")
-                ? .render->append(#line->sub(2) + "\n")
+                ? #text->append(#line->sub(2) + "\n")
             | loop_abort
         }
 
-        .render->append(`</code></pre>`)
+        #text->replace('&', "&amp;")&replace('<', "&lt;")&replace('>', "&gt;")
+        .render->append(#text + `</code></pre>`)
         .leftover = #lines->sub(#end)
     }
 }

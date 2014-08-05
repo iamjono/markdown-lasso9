@@ -19,8 +19,8 @@ define markdown_listItem => type { parent markdown_parser
         }
 
         local(end)   = 1 // skip the first line
-        local(block) = array
-        .render = '<li>\n' + #regex_list->matchString(1) + '\n'
+        local(block) = array(#regex_list->matchString(1))
+        .render = '<li>\n'
 
         // First part doesn't need paragraph tag wrapped around it
         // - go until I hit an empty line or a list item (nested or otherwise)
@@ -39,11 +39,14 @@ define markdown_listItem => type { parent markdown_parser
             #regex_list->setInput(#line)&matches
                 ? loop_abort
 
-            .render->append(#line + "\n")
+            #block->insert(#line)
         }
+        .render->append(markdown_inlineText(#block->asStaticarray)->render + "\n")
+
 
         local(previous_line_empty) = true
         #end-- // back it up to get the possible empty line
+        #block = array
         while(++#end <= #lines->size) => {
             local(line)          = #lines->get(#end)->asCopy
             local(cur_lineEmpty) = #line->asCopy->removeLeading('>')&trim& == ''

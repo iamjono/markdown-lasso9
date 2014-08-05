@@ -11,7 +11,7 @@ define markdown_headerAtx => type { parent markdown_parser
 
         local(level) = #line1->size - #line1->removeLeading("#")&size
 
-        .render   = '<h' + #level + '>' + #line1->trim& + '</h' + #level + '>\n'
+        .render   = '<h' + #level + '>' + markdown_inlineText((:#line1->trim&))->render + '</h' + #level + '>\n'
         .leftover = #lines->sub(2)
     }
 }

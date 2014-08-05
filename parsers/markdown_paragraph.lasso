@@ -9,7 +9,8 @@ define markdown_paragraph => type { parent markdown_parser
             return
         }
 
-        local(end) = 0
+        local(end)   = 0
+        local(block) = array
         .render    = '<p>'
 
         while(++#end <= #lines->size) => {
@@ -20,10 +21,10 @@ define markdown_paragraph => type { parent markdown_parser
             #line->sub(1,2) == '> '
                 ? loop_abort
 
-            .render->append(#line + "\n")
+            #block->insert(#line)
         }
 
-        .render->removeTrailing("\n")&append("</p>\n")
+        .render->append(markdown_inlineText(#block->asStaticArray)->render + "</p>\n")
         .leftover = #lines->sub(#end)
     }
 }

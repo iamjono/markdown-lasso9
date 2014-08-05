@@ -58,7 +58,7 @@ describe(::markdown_codeblock) => {
             ))
             expect("<pre><code>local(a) = 3\n" + 
                     "local(b) = #a\n\n\n"
-                    "if(#a == #b) => {\n" + 
+                    "if(#a == #b) =&gt; {\n" + 
                     "\tlocal(c) = #b\n" + 
                     "    #a++\n"
                     "}\n</code></pre>",
