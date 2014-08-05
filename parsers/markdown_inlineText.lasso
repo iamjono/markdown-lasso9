@@ -1,6 +1,6 @@
 define markdown_inlineText => type { parent markdown_parser
     data
-        protected escapeCharacters = (:`*`, `_`, `{`, `}`, `[`, `]`, `\`)
+        protected escapeCharacters = (:`\`, '`', `*`, `_`, `{`, `}`, `[`, `]`, `(`, `)`, `#`, `+`, `-`, `.`, `!`)
     
     public onCreate(lines::staticarray) => {
         .leftover = (:)
