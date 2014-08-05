@@ -18,6 +18,9 @@ define markdown_document => type { parent markdown_parser
         .lines    = #lines
         .leftover = (:)
     }
+    public onCreate(source::string) => {
+        .onCreate(regExp(-input=#source, -find=`\r\n|\r|\n`)->split)
+    }
 
 
     public render => {

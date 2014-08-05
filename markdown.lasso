@@ -22,5 +22,5 @@ define markdown => type {
         return #rhs
     }
 
-    public render => markdown_document(regExp(-input=.source, -find=`\r\n|\r|\n`)->split)->render
+    public render => markdown_document(.source)->render
 }
