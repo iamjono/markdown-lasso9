@@ -82,6 +82,13 @@ define markdown_inlineText => type { parent markdown_parser
         #regex->appendTail
         #result = #regex->output
 
+        // Find raw links in <>
+        #result->replace(regExp(`<(https?://[^>\s]+)>`), `<a href="$1">$1</a>`)
+
+        #result->replace(regExp(`<(?:mailto:)?([^@]+@[^@]+.[^@]+)>`), `<a href="mailto:$1">$1</a>`)
+        
+            
+
 
         #result->replace(' - ', ` \- `)
         #result->replace(' * ', ` \* `)

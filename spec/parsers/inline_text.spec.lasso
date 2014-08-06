@@ -99,7 +99,7 @@ describe(::markdown_inlineText) => {
 
             expect('<a href="http://www.example.com" title="My Title">link text</a>', #code->render)
         }
-        
+
         it(`leaves link references alone that have no matching reference`) => {
             local(doc)  = markdown_document(``)
             local(code) = markdown_inlineText(#doc, (:"[link text][id]"))
@@ -112,6 +112,22 @@ describe(::markdown_inlineText) => {
             local(code) = markdown_inlineText(#doc, (:"[Daring Fireball][]"))
 
             expect('<a href="http://daringfireball.net">Daring Fireball</a>', #code->render)
+        }
+
+        it(`allows for the automatic links of http links`) => {
+            local(code) = markdown_inlineText(#document, (:"<http://www.example.com>"))
+            expect('<a href="http://www.example.com">http://www.example.com</a>', #code->render)
+
+            local(code) = markdown_inlineText(#document, (:"<https://www.example.com>"))
+            expect('<a href="https://www.example.com">https://www.example.com</a>', #code->render)
+        }
+
+        it(`allows for automatic links of email addresses which are encoded`) => {
+            local(code) = markdown_inlineText(#document, (:"<email@example.com>"))
+            expect('<a href="mailto:email@example.com">email@example.com</a>', #code->render)
+
+            local(code) = markdown_inlineText(#document, (:"<mailto:email@example.com>"))
+            expect('<a href="mailto:email@example.com">email@example.com</a>', #code->render)
         }
     }
 }
