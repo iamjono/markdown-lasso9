@@ -42,7 +42,7 @@ define markdown_document => type { parent markdown_parser
         #source     = #regex->output
         .references = #refs
 
-        .onCreate(self, regExp(-input=#source, -find=`\r\n|\r|\n`)->split)
+        .onCreate(self, (with i in #source->eachLine select #i)->asStaticArray)
     }
 
 
