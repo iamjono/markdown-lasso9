@@ -28,6 +28,8 @@ define markdown_html => type { parent markdown_parser
                 ? loop_abort
         }
 
-        .leftover = #lines->sub(#end+1)
+        #end >= #lines->size
+            ? .leftover = (:)
+            | .leftover = #lines->sub(#end+1)
     }
 }
