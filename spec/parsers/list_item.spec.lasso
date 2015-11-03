@@ -105,8 +105,12 @@ describe(::markdown_listItem) => {
     }
 
     context(`nested block elements`) => {
-        it(`properly parses nested paragraph`) => {
+        it(`properly parses nested paragraph with tab`) => {
             local(item) = markdown_listItem(#document, (:"- line 1", "", "\tnested p"), -unordered)
+            expect("<li>\nline 1\n<p>nested p</p>\n</li>\n", #item->render)
+        }
+        it(`properly parses nested paragraph with four spaces`) => {
+            local(item) = markdown_listItem(#document, (:"- line 1", "", "    nested p"), -unordered)
             expect("<li>\nline 1\n<p>nested p</p>\n</li>\n", #item->render)
         }
 

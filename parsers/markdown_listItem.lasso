@@ -52,7 +52,7 @@ define markdown_listItem => type { parent markdown_parser
             local(line)          = #lines->get(#end)->asCopy
             local(cur_lineEmpty) = #line->asCopy->removeLeading('>')&trim& == ''
 
-            #previous_line_empty and not #cur_lineEmpty and (not #line->beginsWith('\t') or #line->beginsWith('    '))
+            #previous_line_empty and not #cur_lineEmpty and not (#line->beginsWith('\t') or #line->beginsWith('    '))
                 ? loop_abort
 
             #cur_lineEmpty
