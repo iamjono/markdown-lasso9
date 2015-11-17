@@ -18,7 +18,7 @@ describe(::markdown_listOrdered) => {
 
         it(`returns an html ul if passed lines matching markdown ordered list`) => {
             local(code) = markdown_listOrdered(#document, (:"2. nice"))
-            expect('<ul>\n<li>\nnice\n</li>\n</ul>\n', #code->render)
+            expect('<ol>\n<li>\nnice\n</li>\n</ol>\n', #code->render)
         }
 
         it(`correctly parses multiple list items`) => {
@@ -26,19 +26,19 @@ describe(::markdown_listOrdered) => {
                 " 1. an item",
                 " 1. another"
             ))
-            expect('<ul>\n<li>\nan item\n</li>\n<li>\nanother\n</li>\n</ul>\n', #code->render)
+            expect('<ol>\n<li>\nan item\n</li>\n<li>\nanother\n</li>\n</ol>\n', #code->render)
 
             local(code) = markdown_listOrdered(#document, (:
                 "1. an item",
                 "1. another"
             ))
-            expect('<ul>\n<li>\nan item\n</li>\n<li>\nanother\n</li>\n</ul>\n', #code->render)
+            expect('<ol>\n<li>\nan item\n</li>\n<li>\nanother\n</li>\n</ol>\n', #code->render)
 
             local(code) = markdown_listOrdered(#document, (:
                 "   1. an item",
                 "   1. another"
             ))
-            expect('<ul>\n<li>\nan item\n</li>\n<li>\nanother\n</li>\n</ul>\n', #code->render)
+            expect('<ol>\n<li>\nan item\n</li>\n<li>\nanother\n</li>\n</ol>\n', #code->render)
         }
 
         it(`correctly parses multiple list items with blank lines`) => {
@@ -48,7 +48,7 @@ describe(::markdown_listOrdered) => {
                 "",
                 "  1. another"
             ))
-            expect('<ul>\n<li>\nan item\n</li>\n<li>\nanother\n</li>\n</ul>\n', #code->render)
+            expect('<ol>\n<li>\nan item\n</li>\n<li>\nanother\n</li>\n</ol>\n', #code->render)
         }
     }
 

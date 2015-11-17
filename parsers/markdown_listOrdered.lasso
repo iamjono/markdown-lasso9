@@ -2,7 +2,7 @@ define markdown_listOrdered => type { parent markdown_parser
 
     public onCreate(document::markdown_document, lines::staticarray) => {
         .document = #document
-        .render   = '<ul>\n'
+        .render   = '<ol>\n'
         
         //keep rendering list item
         local(line)
@@ -18,8 +18,8 @@ define markdown_listOrdered => type { parent markdown_parser
         }
         
         .leftover = #lines
-        .render == '<ul>\n'
+        .render == '<ol>\n'
             ? .render = ''
-            | .render->append('</ul>\n')
+            | .render->append('</ol>\n')
     }
 }
