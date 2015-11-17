@@ -50,6 +50,28 @@ describe(::markdown_listOrdered) => {
             ))
             expect('<ol>\n<li>\nan item\n</li>\n<li>\nanother\n</li>\n</ol>\n', #code->render)
         }
+
+        it(`correctly parses nested ordered lists`) => {
+            local(code) = markdown_listOrdered(#document, (:
+                "1. an item",
+                "1. another",
+                "\t1. sub1",
+                "\t1. sub2",
+                "1. last"
+            ))
+            expect('<ol>\n<li>\nan item\n</li>\n<li>\nanother\n<ol>\n<li>\nsub1\n</li>\n<li>\nsub2\n</li>\n</ol>\n</li>\n<li>\nlast\n</li>\n</ol>\n', #code->render)
+        }
+
+        it(`correctly parses nested unordered lists`) => {
+            local(code) = markdown_listOrdered(#document, (:
+                "1. an item",
+                "1. another",
+                "    * sub1",
+                "    * sub2",
+                "1. last"
+            ))
+            expect('<ol>\n<li>\nan item\n</li>\n<li>\nanother\n<ul>\n<li>\nsub1\n</li>\n<li>\nsub2\n</li>\n</ul>\n</li>\n<li>\nlast\n</li>\n</ol>\n', #code->render)
+        }
     }
 
     describe(`-> leftover`) => {

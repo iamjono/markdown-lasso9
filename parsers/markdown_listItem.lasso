@@ -19,6 +19,11 @@ define markdown_listItem => type { parent markdown_parser
             return
         }
 
+        // Need to change regex_list so that we can determine if one type of list
+        // contains the other type as a sub list.
+        local(regex_list) = regExp(`^ {0,3}(?:[*+-]|\d+\.)\s+(.*)$`)
+        #regex_list->setInput(#lines->first)&matches
+
         local(end)   = 1 // skip the first line
         local(block) = array(#regex_list->matchString(1))
         .render = '<li>\n'
@@ -52,7 +57,8 @@ define markdown_listItem => type { parent markdown_parser
             local(line)          = #lines->get(#end)->asCopy
             local(cur_lineEmpty) = #line->asCopy->removeLeading('>')&trim& == ''
 
-            #previous_line_empty and not #cur_lineEmpty and not (#line->beginsWith('\t') or #line->beginsWith('    '))
+            //#previous_line_empty and not #cur_lineEmpty and not (#line->beginsWith('\t') or #line->beginsWith('    '))
+            not #cur_lineEmpty and not (#line->beginsWith('\t') or #line->beginsWith('    '))
                 ? loop_abort
 
             #cur_lineEmpty

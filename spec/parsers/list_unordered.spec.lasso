@@ -50,6 +50,39 @@ describe(::markdown_listUnordered) => {
             ))
             expect('<ul>\n<li>\nan item\n</li>\n<li>\nanother\n</li>\n</ul>\n', #code->render)
         }
+
+        it(`correctly parses nested lists with the same list symbol`) => {
+            local(code) = markdown_listUnordered(#document, (:
+                "* an item",
+                "* another",
+                "\t* sub1",
+                "\t* sub2",
+                "* last"
+            ))
+            expect('<ul>\n<li>\nan item\n</li>\n<li>\nanother\n<ul>\n<li>\nsub1\n</li>\n<li>\nsub2\n</li>\n</ul>\n</li>\n<li>\nlast\n</li>\n</ul>\n', #code->render)
+        }
+
+        it(`correctly parses nested lists with different list symbol`) => {
+            local(code) = markdown_listUnordered(#document, (:
+                "* an item",
+                "* another",
+                "    - sub1",
+                "    - sub2",
+                "* last"
+            ))
+            expect('<ul>\n<li>\nan item\n</li>\n<li>\nanother\n<ul>\n<li>\nsub1\n</li>\n<li>\nsub2\n</li>\n</ul>\n</li>\n<li>\nlast\n</li>\n</ul>\n', #code->render)
+        }
+
+        it(`correctly parses nested ordered lists`) => {
+            local(code) = markdown_listUnordered(#document, (:
+                "* an item",
+                "* another",
+                "    0. sub1",
+                "    0. sub2",
+                "* last"
+            ))
+            expect('<ul>\n<li>\nan item\n</li>\n<li>\nanother\n<ol>\n<li>\nsub1\n</li>\n<li>\nsub2\n</li>\n</ol>\n</li>\n<li>\nlast\n</li>\n</ul>\n', #code->render)
+        }
     }
 
     describe(`-> leftover`) => {
