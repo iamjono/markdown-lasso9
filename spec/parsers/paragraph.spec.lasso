@@ -64,5 +64,25 @@ describe(::markdown_paragraph) => {
             expect("<p>This is all\nin one paragraph</p>\n", #code->render)
             expect((:"> Tom's quote here"), #code->leftover)
         }
+
+        it(`stops the paragraph when runs into an indented unordered list`) => {
+            local(code) = markdown_paragraph(#document, (:
+                "This is all",
+                "in one paragraph",
+                "    - Start of a list"
+            ))
+            expect("<p>This is all\nin one paragraph</p>\n", #code->render)
+            expect((:"- Start of a list"), #code->leftover)
+        }
+
+        it(`stops the paragraph when runs into an indented ordered list`) => {
+            local(code) = markdown_paragraph(#document, (:
+                "This is all",
+                "in one paragraph",
+                "\t1. First item"
+            ))
+            expect("<p>This is all\nin one paragraph</p>\n", #code->render)
+            expect((:"1. First item"), #code->leftover)
+        }
     }
 }
